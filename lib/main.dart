@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'dart:math';
 
@@ -13,8 +15,8 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Demo',
       theme: ThemeData(
         brightness: Brightness.dark,
-        primarySwatch: Colors.blue,
-        primaryColor: Colors.orange,
+        primarySwatch: Colors.orange,
+        // primaryColor: Colors.orange,
       ),
       home: MyHomePage(),
     );
@@ -30,13 +32,40 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int? randomNumber;
+  String animatText = 'YES';
+
+  double _counterProgress = 0;
+  bool _progressDone = true;
 
   void getRandomNumber() {
+    _counterProgress = 0;
+    _progressDone = false;
+    aminationText();
     Random rnd = Random();
     setState(() {
-      randomNumber = rnd.nextInt(10);
+      randomNumber = rnd.nextInt(2);
+      print(randomNumber);
     });
-    // print(rnd.nextInt(100));
+  }
+
+  void aminationText() {
+    Timer.periodic(Duration(milliseconds: 100), (Timer t) {
+      if (_counterProgress.toStringAsFixed(1) == '1.0') {
+        t.cancel();
+        setState(() {
+          _progressDone = true;
+        });
+        return;
+      }
+      setState(() {
+        if (animatText == 'YES') {
+          animatText = 'NO';
+        } else {
+          animatText = 'YES';
+        }
+      });
+      _counterProgress += 0.1;
+    });
   }
 
   @override
@@ -49,16 +78,26 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            randomNumber != null
+            _progressDone
+                ? Container()
+                : Text(
+                    animatText,
+                    style: Theme.of(context).textTheme.headline1,
+                  ),
+            randomNumber != null && _progressDone == true
                 ? Text(
-                    randomNumber! < 5 ? 'no' : 'yes',
+                    randomNumber! < 1 ? 'NO' : 'YES',
                     style: Theme.of(context).textTheme.headline1,
                   )
                 : Container(),
-            TextButton(
-              onPressed: () => getRandomNumber(),
-              child: Text('say a question and press on the button'),
-            ),
+            _progressDone
+                ? TextButton(
+                    onPressed: () => getRandomNumber(),
+                    child: Text('say a question and press on the button'),
+                  )
+                : Container(
+                    height: 50,
+                  ),
           ],
         ),
       ),
