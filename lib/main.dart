@@ -4,23 +4,7 @@ import 'package:flutter/material.dart';
 import 'dart:math';
 
 void main() {
-  runApp(MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        brightness: Brightness.dark,
-        primarySwatch: Colors.orange,
-        // primaryColor: Colors.orange,
-      ),
-      home: MyHomePage(),
-    );
-  }
+  runApp(MyHomePage());
 }
 
 class MyHomePage extends StatefulWidget {
@@ -31,16 +15,22 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  bool _darkMode = true;
   int? randomNumber;
   String animatText = 'YES';
 
   double _counterProgress = 0;
   bool _progressDone = true;
 
+  ThemeData _light = ThemeData.light().copyWith(
+    primaryColor: Colors.orange,
+  );
+  ThemeData _dark = ThemeData.dark().copyWith(primaryColor: Colors.orange);
+
   void getRandomNumber() {
     _counterProgress = 0;
     _progressDone = false;
-    aminationText();
+    animationText();
     Random rnd = Random();
     setState(() {
       randomNumber = rnd.nextInt(2);
@@ -48,7 +38,7 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  void aminationText() {
+  void animationText() {
     Timer.periodic(Duration(milliseconds: 100), (Timer t) {
       if (_counterProgress.toStringAsFixed(1) == '1.0') {
         t.cancel();
@@ -64,43 +54,71 @@ class _MyHomePageState extends State<MyHomePage> {
           animatText = 'YES';
         }
       });
-      _counterProgress += 0.1;
+      _counterProgress += 0.03;
+    });
+  }
+
+  void darkTheme(bool val) {
+    setState(() {
+      _darkMode = val;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('YES OR NO'),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            _progressDone
-                ? Container()
-                : Text(
-                    animatText,
-                    style: Theme.of(context).textTheme.headline1,
-                  ),
-            randomNumber != null && _progressDone == true
-                ? Text(
-                    randomNumber! < 1 ? 'NO' : 'YES',
-                    style: Theme.of(context).textTheme.headline1,
-                  )
-                : Container(),
-            _progressDone
-                ? TextButton(
-                    onPressed: () => getRandomNumber(),
-                    child: Text('say a question and press on the button'),
-                  )
-                : Container(
-                    height: 50,
-                  ),
-          ],
-        ),
-      ),
-    );
+    return MaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: 'YES or NO',
+        darkTheme: _dark,
+        theme: _light,
+        themeMode: _darkMode ? ThemeMode.dark : ThemeMode.light,
+        home: Scaffold(
+          appBar: AppBar(
+            title: Text('YES OR NO'),
+          ),
+          body: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Container(
+                // decoration: BoxDecoration(color: Colors.amber),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Text('Dark:'),
+                    Switch(value: _darkMode, onChanged: (val) => darkTheme(val))
+                  ],
+                ),
+              ),
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    _progressDone
+                        ? Container()
+                        : Text(
+                            animatText,
+                            style: Theme.of(context).textTheme.headline1,
+                          ),
+                    randomNumber != null && _progressDone == true
+                        ? Text(
+                            randomNumber! < 1 ? 'NO' : 'YES',
+                            style: Theme.of(context).textTheme.headline1,
+                          )
+                        : Container(),
+                    _progressDone
+                        ? TextButton(
+                            onPressed: () => getRandomNumber(),
+                            child:
+                                Text('say a question and press on the button'),
+                          )
+                        : Container(
+                            height: 50,
+                          ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ));
   }
 }
